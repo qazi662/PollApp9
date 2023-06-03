@@ -46,7 +46,7 @@ jobs:
 
       - name: Setup Node.js
 
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v2.4.1
 
         with:
 
@@ -67,3 +67,4 @@ jobs:
           chmod +x ./android/gradlew
 
           cd android && ./gradlew assembleRelease
+
