@@ -4,21 +4,20 @@
 
 
 
-name: Android CI2
 
-on:
 
-  push:
 
-    branches:
 
-      - main
 
-  pull_request:
 
-    branches:
 
-      - main
+
+
+
+
+name: Android CI
+
+on: [push, pull_request]
 
 jobs:
 
@@ -30,41 +29,41 @@ jobs:
 
     steps:
 
-      - name: Checkout code
+    - name: Checkout code
 
-        uses: actions/checkout@v2
+      uses: actions/checkout@v2
 
-      - name: Setup Java JDK
+    - name: Setup Java JDK
 
-        uses: actions/setup-java@v2
+      uses: actions/setup-java@v2
 
-        with:
+      with:
 
-          java-version: '11'
+        java-version: '11'
 
-          distribution: 'adopt'
+        distribution: 'adopt'
 
-      - name: Setup Node.js
+    - name: Setup Node.js
 
-        uses: actions/setup-node@v2.4.1
+    - uses: actions/setup-node@v2.4.1
 
-        with:
+      with:
 
-          node-version: '16'
+        node-version: 16
 
-      - name: Install Dependencies
+    - name: Install Dependencies
 
-        run: |
+      run: |
 
-          npm ci
+        npm ci
 
-          npx jetify
+        npx jetify
 
-      - name: Build Android Release
+    - name: Build Android Release
 
-        run: |
+      run: |
 
-          chmod +x ./android/gradlew
+        chmod +x ./android/gradlew
 
-          cd android && ./gradlew assembleRelease
-
+        cd android && ./gradlew assembleRelease
+        
