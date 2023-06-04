@@ -1,69 +1,16 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-name: Android CI
-
-on: [push, pull_request]
-
+name: Upload Project to GitHub
+on:
+  push:
+    branches:
+      - master
 jobs:
-
-  build:
-
-    name: Build
-
+  build_and_upload:
     runs-on: ubuntu-latest
-
     steps:
-
-    - name: Checkout code
-
-      uses: actions/checkout@v2
-
-    - name: Setup Java JDK
-
-      uses: actions/setup-java@v2
-
-      with:
-
-        java-version: '11'
-
-        distribution: 'adopt'
-
-    - name: Setup Node.js
-
-      uses: actions/setup-node@v2.4.1
-
-      with:
-
-        node-version: 16
-
-    - name: Install Dependencies
-
-      run: |
-
-        npm ci
-
-        npx jetify
-
-    - name: Build Android Release
-
-      run: |
-
-        chmod +x ./android/gradlew
-
-        cd android && ./gradlew assembleRelease
-        
+      - uses: actions/checkout@v2
+      - run: npm install
+      - run: npm run build
+      - uses: actions/upload-artifact@v2
+        with:
+          name: project
+          path: build/
