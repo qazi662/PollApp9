@@ -44,12 +44,10 @@ const ProfileScreen = ({navigation}) => {
   const handleLogout = () => {
     signOut(auth)
       .then(() => {
-        // User signed out successfully
         navigation.replace('Login');
       })
       .catch(error => {
         console.log(error);
-        // Handle logout error
       });
   };
 
@@ -114,6 +112,7 @@ const ProfileScreen = ({navigation}) => {
           onCancel={() => {
             setOpen(false);
           }}
+          mode="date"
         />
       </View>
       <View style={styles.switch}>
