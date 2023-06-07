@@ -1,99 +1,46 @@
-import React, { Component } from 'react';
-import { View, Text, TextInput, Button } from 'react-native';
-import firebase from 'react-native-firebase';
-//import * as firebase from "firebase/app";
-class LoginScreen extends Component {
+import React, {useEffect, useState} from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
+import LoginScreen from './src/screens/LoginScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
+import {auth} from './src/firebase';
+import {onAuthStateChanged} from 'firebase/auth';
+import AppStack from './src/stacks/AppStack';
+import AuthStack from './src/stacks/AuthStack';
 
-  state = {
-    username: '',
-    password: '',
-  };
+const Stack = createStackNavigator();
 
-  onSignIn = () => {
-    firebase.auth().signInWithEmailAndPassword(this.state.username, this.state.password)
-      .then(() => {
-        this.props.navigation.navigate('Profile');
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
+const App = () => {
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState(null);
 
-  render() {
-    return (
-      <View>
-        <Text>Login</Text>
-        <TextInput
-          placeholder="Username"
-          onChangeText={(username) => this.setState({ username })}
-        />
-        <TextInput
-          placeholder="Password"
-          onChangeText={(password) => this.setState({ password })}
-          secureTextEntry={true}
-        />
-        <Button
-          title="Sign In"
-          onPress={this.onSignIn}
-        />
-      </View>
-    );
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, _user => {
+      setUser(_user);
+      if (initializing) {
+        setInitializing(false);
+      }
+    });
+
+    // Clean up the subscription
+    return () => unsubscribe();
+  }, [initializing]);
+
+  if (initializing) {
+    return null; // Render a loading screen if Firebase initialization is in progress
   }
-}
 
-class ProfileScreen extends Component {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{headerShown: false}}>
+        {user ? (
+          <Stack.Screen name="AppStack" component={AppStack} />
+        ) : (
+          <Stack.Screen name="AuthStack" component={AuthStack} />
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
 
-  state = {
-    name: '',
-    nick: '',
-    birthday: '',
-    gender: '',
-    agree: false,
-    about: '',
-  };
-
-  render() {
-    return (
-      <View>
-        <Text>Profile</Text>
-        <TextInput
-          placeholder="Name"
-          onChangeText={(name) => this.setState({ name })}
-        />
-        <TextInput
-          placeholder="Nick"
-          onChangeText={(nick) => this.setState({ nick })}
-        />
-        <TextInput
-          placeholder="Birthday"
-          onChangeText={(birthday) => this.setState({ birthday })}
-        />
-        <TextInput
-          placeholder="Gender"
-          onChangeText={(gender) => this.setState({ gender })}
-        />
-        <Switch
-          value={this.state.agree}
-          onChange={(agree) => this.setState({ agree })}
-        />
-        <TextInput
-          placeholder="About"
-          multiline={true}
-          onChangeText={(about) => this.setState({ about })}
-        />
-      </View>
-    );
-  }
-}
-
-export default class App extends Component {
-
-  render() {
-    return (
-      <View>
-        <LoginScreen />
-        <ProfileScreen />
-      </View>
-    );
-  }
-}
+export default App;
